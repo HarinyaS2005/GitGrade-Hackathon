@@ -1,0 +1,33 @@
+import streamlit as st
+from analyzer import analyze_repo
+from scorer import calculate_score
+from summary import generate_summary
+from roadmap import generate_roadmap
+
+st.set_page_config(page_title="GitGrade AI", layout="centered")
+
+st.title("🚀 GitGrade AI")
+st.write("AI-powered GitHub Repository Evaluation Tool")
+
+repo_url = st.text_input("Paste a public GitHub Repository URL")
+
+if st.button("Analyze Repository"):
+    with st.spinner("Analyzing repository..."):
+        data = analyze_repo(repo_url)
+
+        if data is None:
+            st.error("Invalid GitHub repository URL")
+        else:
+            score, readiness = calculate_score(data)
+            summary = generate_summary(score)
+            roadmap = generate_roadmap(data, score)
+
+            st.metric("Overall Score", f"{score}/100")
+            st.success(f"Recruiter Readiness: {readiness}")
+
+            st.subheader("🧠 AI Evaluation Summary")
+            st.info(summary)
+
+            st.subheader("👨‍💻 AI Mentor Roadmap")
+            for step in roadmap:
+                st.write("•", step)
